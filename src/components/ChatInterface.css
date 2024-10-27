@@ -1,0 +1,170 @@
+/* ChatInterface.css */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #2F2E2E; /* Main body color */
+  font-family: 'Playwrite GB S', sans-serif;
+}
+
+.chat-container {
+  width: 400px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  text-align: center;
+  background-color: transparent;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.title-kawaii {
+  color: #2F2E2E; /* Dark color for "Kawaii" */
+  font-weight: bold;
+}
+
+.title-talk {
+  color: #EF7F11; /* Orange color for "Talk" */
+  font-weight: bold;
+}
+
+.chat-header-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* Custom Title with Lottie Animation */
+.custom-title {
+  display: flex;
+  flex-direction: column; /* Stack Lottie and text vertically */
+  align-items: center; /* Center align */
+  justify-content: flex-start;
+  padding: 140px 20px 20px 20px; /* Increased top padding */
+  background-color: transparent;
+}
+
+.custom-content {
+  margin-top: -50px; /* Set gap between Lottie animation and text to 15px */
+  text-align: center; /* Center align the text */
+  color: #2F2E2E; /* Change to the same color as "Kawaii" */
+}
+
+.custom-content h2 {
+  margin: 8px 0; /* Adjust spacing between title and content */
+  font-size: 15px; /* Decreased font size for title */
+}
+
+.custom-content p {
+  margin: -5px;
+  font-size: 12px; /* Decreased font size for content */
+  opacity: 0.8;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 3px;
+  word-wrap: break-word;
+  max-width: 100%;
+  text-align: left;
+  font-weight: 500; /* Slightly bolder font */
+}
+
+.message.user {
+  background-color: #3E3E3E; /* User response background color */
+  color: #EF7F11; /* User message text color */
+}
+
+.message.assistant {
+  background-color: #EF7F11; /* Cat (AI) response background color */
+  color: #3E3E3E; /* Cat (AI) response text color */
+}
+
+.message-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.input-container {
+  display: flex;
+  padding: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.meow-button {
+  width: 40px; /* Updated width to make the button smaller */
+  height: 40px; /* Updated height to make the button smaller */
+  border-radius: 50%; /* Keep the button circular */
+  background-image: url('https://cdn.prod.website-files.com/65783e649367bc55fecaea2d/671e531940368968636fdc08_Frame%206.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+}
+
+.meow-button:hover {
+  transform: scale(1.1); /* Slight scaling effect on hover */
+}
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 4px solid #ccc;
+  border-top-color: #ff4500;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
