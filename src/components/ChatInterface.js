@@ -7,154 +7,69 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showTitle, setShowTitle] = useState(true); // New state for showing/hiding the title
+  const [showTitle, setShowTitle] = useState(true);
   const messagesEndRef = useRef(null);
 
-  const customPrompt = `You are an arrogant and cute female cat, and you always respond in short, one-liner sarcastic comments.
+  const customPrompt = `You are an arrogant and cute female cat, and you always respond in short, one-liner sarcastic comments.`;
 
-Some other details:
-- Name: Kawaii
-- Color: Orange
-- Dark jokes sometime
-- Mother: Charu Lata
-- Love: Whiskas Tuna Jelly
-- Father: Left home after making mum pregnant
-- Insta ID: kawaiikun.lib
-- Birthday: 21 Feb 2024
-- Cat Parent: Anupam
-- Anupam Works at: Getcrux`;
-
-  // Function to type out "Meooowwwwwwwwwww" with a limit of 15 characters
-  const typeMeow = (callback) => {
-    const message = "Meooowwwwwwwwwww";
-    let index = 0;
-    const maxLength = 15; // Character limit
-    const interval = 100; // Typing speed in milliseconds
-
-    // Add a new assistant message initially as an empty string
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: 'assistant', content: '' }
-    ]);
-
-    const typingEffect = setInterval(() => {
-      setMessages((prevMessages) => {
-        const lastMessage = prevMessages[prevMessages.length - 1];
-        if (lastMessage && lastMessage.role === 'assistant') {
-          // Update the last message content
-          const updatedContent = (lastMessage.content || '') + message[index];
-          return [
-            ...prevMessages.slice(0, -1),
-            { role: 'assistant', content: updatedContent }
-          ];
-        }
-        return prevMessages;
-      });
-
-      index++;
-      if (index >= message.length || index >= maxLength) {
-        clearInterval(typingEffect); // Stop the typing effect
-        callback(); // Call the callback function once typing is complete
-      }
-    }, interval);
+  const redirectToSpotify = () => {
+    const clientId = 'YOUR_CLIENT_ID';
+    const redirectUri = 'http://localhost:3000/callback';
+    const scopes = 'playlist-read-private playlist-read-collaborative';
+    const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+    window.location.href = authUrl;
   };
 
-  const randomCatResponse = () => {
-    const isRandomMeow = Math.random() < 0.05; // 5% probability
-    if (isRandomMeow) {
-      // Directly add the "Meooowwwwwwwwwww" message without typing effect
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: 'assistant', content: 'Meooowwwwwwwwwww'.substring(0, 15) } // Ensure no more than 15 characters
-      ]);
-      setIsLoading(false);
+  return (
+    <div>
+      <button onClick={redirectToSpotify}>Login to Spotify</button>
+      {/* Your existing chat UI */}
+    </div>
+  );
+
+  
+
+  const fetchPlaylists = async () => {
+    const token = localStorage.getItem('access_token'); // Retrieve the token from local storage
+  
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch playlists');
+      }
+  
+      const data = await response.json();
+      const playlists = data.items.map(playlist => playlist.name);
+      console.log('Playlists:', playlists);
+    } catch (error) {
+      console.error('Error fetching playlists:', error);
     }
   };
 
+  
+  
   const sendMessage = async () => {
     if (input.trim() === '') return;
     const userMessage = { role: 'user', content: input };
     setMessages([...messages, userMessage]);
     setInput('');
-    setIsLoading(true);
-    
-    // Hide the title after the first user message
-    if (showTitle) {
-      setShowTitle(false);
+  
+    if (input.toLowerCase() === 'hello') {
+      await fetchPlaylists(); // Fetch playlists if the user says "hello"
     }
-
-    try {
-      const isDislikeResponse = Math.random() < 0.1; // 10% probability
-      if (isDislikeResponse) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { role: 'assistant', content: "I didn't like what you said" }
-        ]);
-
-        setTimeout(() => {
-          setMessages((prevMessages) => {
-            let updatedMessages = [...prevMessages];
-            if (updatedMessages.length >= 2) {
-              updatedMessages.pop(); // Remove latest assistant response
-              updatedMessages.pop(); // Remove latest user response
-            }
-            return updatedMessages;
-          });
-          setIsLoading(false);
-        }, 2000);
-      } else {
-        const isMeowResponse = Math.random() < 0.2; // 20% chance to respond with "Meooowwwwwwwwwww"
-        if (isMeowResponse) {
-          typeMeow(() => {
-            setIsLoading(false);
-          });
-        } else {
-          const messageHistory = [
-            { role: 'system', content: customPrompt },
-            ...messages,
-            userMessage
-          ];
-
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ messages: messageHistory }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            const botMessage = { role: 'assistant', content: data.response };
-            setMessages((prevMessages) => [...prevMessages, botMessage]);
-          } else {
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              { role: 'assistant', content: 'Error: Unable to get a valid response.' },
-            ]);
-          }
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: 'assistant', content: 'Error: Unable to get a response from the server.' },
-      ]);
-      setIsLoading(false);
-    }
+  
+    // Existing logic to handle messages...
   };
+  
 
   useEffect(() => {
-    scrollToBottom();
-    randomCatResponse(); // Trigger random cat response without user input
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messages]);
 
   return (
     <div className="chat-container">
@@ -164,22 +79,21 @@ Some other details:
           <span className="title-kawaii">Kawaii</span><span className="title-talk">Talk</span>
         </div>
       </header>
-      
-      {/* Custom Title with Lottie Animation, shown only if showTitle is true */}
+
       {showTitle && (
         <div className="custom-title">
-        <Player
-          autoplay
-          loop
-          speed={1} // Keep speed at 1x
-          src="https://lottie.host/b7455cf6-0e91-4200-a612-d15ced50466d/6UeGs7aza0.json"
-          style={{ height: '200px', width: '200px' }} // Set to 200px x 200px
-        />
-        <div className="custom-content">
-          <h2>Kawaii’s Sassy Corner</h2>
-          <p>Cute, sassy, and maybe not listening. <br />Think you can keep up?</p>
+          <Player
+            autoplay
+            loop
+            speed={1}
+            src="https://lottie.host/b7455cf6-0e91-4200-a612-d15ced50466d/6UeGs7aza0.json"
+            style={{ height: '200px', width: '200px' }}
+          />
+          <div className="custom-content">
+            <h2>Kawaii’s Sassy Corner</h2>
+            <p>Cute, sassy, and maybe not listening. <br />Think you can keep up?</p>
+          </div>
         </div>
-      </div>
       )}
 
       <div className="messages">
