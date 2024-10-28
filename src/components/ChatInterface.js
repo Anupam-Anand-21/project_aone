@@ -8,7 +8,8 @@ import {
   fetchTracks,
   addTrackToPlaylist,
   createPlaylist,
-  deletePlaylist, // Import deletePlaylist from spotifyApi
+  deletePlaylist,
+  deleteTrackFromPlaylist, // Import deleteTrackFromPlaylist from spotifyApi
 } from '../utils/spotifyApi';
 
 const ChatInterface = () => {
@@ -16,6 +17,7 @@ const ChatInterface = () => {
   const [userId, setUserId] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState(null); // Track the selected playlist ID
   const [playlistName, setPlaylistName] = useState('');
   const [playlistDescription, setPlaylistDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,6 +59,7 @@ const ChatInterface = () => {
     if (!accessToken) return;
 
     setIsLoading(true);
+    setSelectedPlaylistId(playlistId); // Set the selected playlist ID
     try {
       const fetchedTracks = await fetchTracks(accessToken, playlistId);
       setTracks(fetchedTracks);
@@ -74,6 +77,7 @@ const ChatInterface = () => {
     try {
       await addTrackToPlaylist(accessToken, playlistId, trackUri);
       alert('Track "Sunflower" has been added to the playlist.');
+      handleFetchTracks(playlistId); // Refresh the tracks list
     } catch (error) {
       alert('Failed to add track.');
     }
@@ -104,16 +108,16 @@ const ChatInterface = () => {
     }
   };
 
-  const handleDeletePlaylist = async (playlistId) => {
-    if (!accessToken) return;
+  const handleDeleteTrack = async (trackUri) => {
+    if (!accessToken || !selectedPlaylistId) return;
 
     setIsLoading(true);
     try {
-      await deletePlaylist(accessToken, playlistId);
-      alert('Playlist deleted successfully!');
-      handleFetchPlaylists(); // Refresh playlists after deletion
+      await deleteTrackFromPlaylist(accessToken, selectedPlaylistId, trackUri);
+      alert('Track deleted successfully!');
+      handleFetchTracks(selectedPlaylistId); // Refresh tracks after deletion
     } catch (error) {
-      alert('Failed to delete playlist.');
+      alert('Failed to delete track.');
     } finally {
       setIsLoading(false);
     }
@@ -145,9 +149,11 @@ const ChatInterface = () => {
         playlists={playlists}
         onFetchTracks={handleFetchTracks}
         onAddTrack={handleAddTrack}
-        onDelete={handleDeletePlaylist} // Pass handleDeletePlaylist as a prop
       />
-      <TrackList tracks={tracks} />
+      <TrackList
+        tracks={tracks}
+        onDeleteTrack={handleDeleteTrack}
+      />
     </div>
   );
 };

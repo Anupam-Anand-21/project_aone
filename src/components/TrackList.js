@@ -1,7 +1,7 @@
 // src/components/TrackList.js
 import React from 'react';
 
-const TrackList = ({ tracks }) => {
+const TrackList = ({ tracks, onDeleteTrack }) => {
   return (
     <div className="tracks">
       <h3>Tracks:</h3>
@@ -9,6 +9,12 @@ const TrackList = ({ tracks }) => {
         {tracks.map((track, index) => (
           <li key={index}>
             {track.track.name} by {track.track.artists.map((artist) => artist.name).join(', ')}
+            <button
+              onClick={() => onDeleteTrack(track.track.uri)}
+              style={{ marginLeft: '10px' }}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>

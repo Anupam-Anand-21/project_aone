@@ -1,5 +1,6 @@
 // src/utils/spotifyApi.js
 
+// Define the functions
 export const fetchUserId = async (accessToken) => {
   try {
     const response = await fetch('https://api.spotify.com/v1/me', {
@@ -110,7 +111,28 @@ export const createPlaylist = async (accessToken, userId, playlistName, playlist
   }
 };
 
-// src/utils/spotifyApi.js
+export const deleteTrackFromPlaylist = async (accessToken, playlistId, trackUri) => {
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        tracks: [{ uri: trackUri }],
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete track');
+    }
+  } catch (error) {
+    console.error('Error deleting track:', error);
+    throw error;
+  }
+};
 
 export const deletePlaylist = async (accessToken, playlistId) => {
   try {
@@ -131,3 +153,4 @@ export const deletePlaylist = async (accessToken, playlistId) => {
   }
 };
 
+// All functions are now exported correctly in a single export statement
