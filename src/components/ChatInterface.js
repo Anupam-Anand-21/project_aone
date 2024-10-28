@@ -53,12 +53,12 @@ const ChatInterface = () => {
       console.error('Access token or user ID is not available');
       return;
     }
-  
+
     if (playlistName.trim() === '') {
       alert('Please enter a playlist name');
       return;
     }
-  
+
     setIsLoading(true);
     try {
       const response = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
@@ -73,9 +73,9 @@ const ChatInterface = () => {
           public: true, // Set this to true to make the playlist public
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         console.log('Playlist Created:', data);
         alert(`Playlist "${data.name}" created successfully!`);
@@ -156,6 +156,44 @@ const ChatInterface = () => {
     }
   };
 
+  // Function to add a track to a playlist
+  const addTrackToPlaylist = async (playlistId) => {
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+
+    const trackUri = 'spotify:track:3KkXRkHbMCARz0aVfEt68P'; // URI for "Sunflower"
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          uris: [trackUri], // The URI of the track to be added
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Track added successfully:', data);
+        alert('Track "Sunflower" has been added to the playlist.');
+      } else {
+        console.error('Error adding track:', data);
+        alert('Failed to add the track to the playlist.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while adding the track to the playlist.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Handle sending a message
   const sendMessage = () => {
     if (input.trim() === '') return;
@@ -192,6 +230,15 @@ const ChatInterface = () => {
               {playlists.map((playlist) => (
                 <li key={playlist.id} onClick={() => fetchTracks(playlist.id)}>
                   {playlist.name}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the click from triggering fetchTracks
+                      addTrackToPlaylist(playlist.id);
+                    }}
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Add "Sunflower"
+                  </button>
                 </li>
               ))}
             </ul>
