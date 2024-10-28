@@ -1,7 +1,7 @@
 // src/components/PlaylistList.js
 import React from 'react';
 
-const PlaylistList = ({ playlists, onFetchTracks, onAddTrack }) => {
+const PlaylistList = ({ playlists, onFetchTracks, onAddTrack, onDelete }) => {
   return (
     <div className="playlists">
       <h3>Your Playlists:</h3>
@@ -17,6 +17,15 @@ const PlaylistList = ({ playlists, onFetchTracks, onAddTrack }) => {
               style={{ marginLeft: '10px' }}
             >
               Add "Sunflower"
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering fetchTracks
+                onDelete(playlist.id);
+              }}
+              style={{ marginLeft: '10px' }}
+            >
+              Delete
             </button>
           </li>
         ))}

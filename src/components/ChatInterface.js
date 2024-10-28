@@ -7,7 +7,8 @@ import {
   fetchPlaylists,
   fetchTracks,
   addTrackToPlaylist,
-  createPlaylist, // Import createPlaylist from spotifyApi
+  createPlaylist,
+  deletePlaylist, // Import deletePlaylist from spotifyApi
 } from '../utils/spotifyApi';
 
 const ChatInterface = () => {
@@ -103,6 +104,21 @@ const ChatInterface = () => {
     }
   };
 
+  const handleDeletePlaylist = async (playlistId) => {
+    if (!accessToken) return;
+
+    setIsLoading(true);
+    try {
+      await deletePlaylist(accessToken, playlistId);
+      alert('Playlist deleted successfully!');
+      handleFetchPlaylists(); // Refresh playlists after deletion
+    } catch (error) {
+      alert('Failed to delete playlist.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="chat-container">
       {isLoading && <div className="loading-indicator">Loading...</div>}
@@ -125,7 +141,12 @@ const ChatInterface = () => {
         />
         <button onClick={handleCreatePlaylist}>Create Playlist</button>
       </div>
-      <PlaylistList playlists={playlists} onFetchTracks={handleFetchTracks} onAddTrack={handleAddTrack} />
+      <PlaylistList
+        playlists={playlists}
+        onFetchTracks={handleFetchTracks}
+        onAddTrack={handleAddTrack}
+        onDelete={handleDeletePlaylist} // Pass handleDeletePlaylist as a prop
+      />
       <TrackList tracks={tracks} />
     </div>
   );

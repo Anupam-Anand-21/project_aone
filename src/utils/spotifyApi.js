@@ -109,3 +109,25 @@ export const createPlaylist = async (accessToken, userId, playlistName, playlist
     throw error;
   }
 };
+
+// src/utils/spotifyApi.js
+
+export const deletePlaylist = async (accessToken, playlistId) => {
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/followers`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete playlist');
+    }
+  } catch (error) {
+    console.error('Error deleting playlist:', error);
+    throw error;
+  }
+};
+
