@@ -7,6 +7,7 @@ import {
   fetchPlaylists,
   fetchTracks,
   addTrackToPlaylist,
+  createPlaylist, // Import createPlaylist from spotifyApi
 } from '../utils/spotifyApi';
 
 const ChatInterface = () => {
@@ -77,11 +78,52 @@ const ChatInterface = () => {
     }
   };
 
+  const handleCreatePlaylist = async () => {
+    if (!accessToken || !userId) {
+      console.error('Access token or user ID is not available');
+      return;
+    }
+
+    if (playlistName.trim() === '') {
+      alert('Please enter a playlist name');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const newPlaylist = await createPlaylist(accessToken, userId, playlistName, playlistDescription);
+      alert(`Playlist "${newPlaylist.name}" created successfully!`);
+      handleFetchPlaylists(); // Refresh playlists after creating a new one
+      setPlaylistName(''); // Clear input fields
+      setPlaylistDescription('');
+    } catch (error) {
+      alert('An error occurred while creating the playlist.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="chat-container">
       {isLoading && <div className="loading-indicator">Loading...</div>}
       <div className="fetch-playlist">
         <button onClick={handleFetchPlaylists}>Fetch Playlist</button>
+      </div>
+      <div className="create-playlist">
+        <h3>Create a New Playlist</h3>
+        <input
+          type="text"
+          placeholder="Playlist Name"
+          value={playlistName}
+          onChange={(e) => setPlaylistName(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Playlist Description"
+          value={playlistDescription}
+          onChange={(e) => setPlaylistDescription(e.target.value)}
+        />
+        <button onClick={handleCreatePlaylist}>Create Playlist</button>
       </div>
       <PlaylistList playlists={playlists} onFetchTracks={handleFetchTracks} onAddTrack={handleAddTrack} />
       <TrackList tracks={tracks} />
