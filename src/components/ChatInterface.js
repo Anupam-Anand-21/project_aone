@@ -6,7 +6,6 @@ const ChatInterface = () => {
   const [userId, setUserId] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]); // State to store tracks
-  const [input, setInput] = useState('');
   const [playlistName, setPlaylistName] = useState('');
   const [playlistDescription, setPlaylistDescription] = useState('');
   const [messages, setMessages] = useState([]);
@@ -194,34 +193,9 @@ const ChatInterface = () => {
     }
   };
 
-  // Handle sending a message
-  const sendMessage = () => {
-    if (input.trim() === '') return;
-
-    const userMessage = { role: 'user', content: input };
-    setMessages([...messages, userMessage]);
-    setInput('');
-
-    // Fetch playlists as a simulated "response" when "hello" is typed
-    if (input.toLowerCase() === 'hello') {
-      fetchPlaylists();
-    }
-  };
-
   return (
     <div className="chat-container">
-      <header className="chat-header">
-        <div className="header-content">
-          <span className="title-kawaii">Kawaii</span>
-          <span className="title-talk">Talk</span>
-        </div>
-      </header>
       <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.role}`}>
-            <span className="message-content">{msg.content}</span>
-          </div>
-        ))}
         {isLoading && <div className="loading-indicator">Loading...</div>}
         {playlists.length > 0 && (
           <div className="playlists">
@@ -273,15 +247,8 @@ const ChatInterface = () => {
         />
         <button onClick={createPlaylist}>Create Playlist</button>
       </div>
-      <div className="input-container">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type at your own risk..."
-          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-        />
-        <button onClick={sendMessage}>Send</button>
+      <div className="fetch-playlist">
+        <button onClick={fetchPlaylists}>Fetch Playlist</button>
       </div>
     </div>
   );
