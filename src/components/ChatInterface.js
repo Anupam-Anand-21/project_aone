@@ -93,7 +93,6 @@ const ChatInterface = () => {
       setIsLoading(false);
     }
   };
-  
 
   // Fetch user's playlists from Spotify
   const fetchPlaylists = async () => {
@@ -121,6 +120,37 @@ const ChatInterface = () => {
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while fetching playlists.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to fetch tracks for a selected playlist
+  const fetchTracks = async (playlistId) => {
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setTracks(data.items); // Set the tracks state with the fetched tracks
+        console.log('Fetched Tracks:', data.items);
+      } else {
+        console.error('Error fetching tracks:', data);
+        alert('Failed to fetch tracks.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while fetching tracks.');
     } finally {
       setIsLoading(false);
     }
@@ -160,8 +190,20 @@ const ChatInterface = () => {
             <h3>Your Playlists:</h3>
             <ul>
               {playlists.map((playlist) => (
-                <li key={playlist.id}>
+                <li key={playlist.id} onClick={() => fetchTracks(playlist.id)}>
                   {playlist.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {tracks.length > 0 && (
+          <div className="tracks">
+            <h3>Tracks:</h3>
+            <ul>
+              {tracks.map((track, index) => (
+                <li key={index}>
+                  {track.track.name} by {track.track.artists.map((artist) => artist.name).join(', ')}
                 </li>
               ))}
             </ul>
